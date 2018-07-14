@@ -1,2 +1,2 @@
-# forecast_wave_height
-An extreme value analysis of a time series wave data
+wa# forecast_wave_height
+An arima model approach to forecast time series wave data.
