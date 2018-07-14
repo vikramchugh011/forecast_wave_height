@@ -1,0 +1,31 @@
+library(zoo)
+library(tseries)
+library(forecast)
+monthly = read.zoo("mehamn_monthly.csv")
+train = monthly[1:600]
+test = monthly[601:624]
+train_ts = ts(train, start = c(1957,9), frequency = 12)
+test_ts = ts(test, start = c(2007,9), frequency = 12)
+#decomp_test = decompose(test_ts)
+#decomp_train = decompose(train_ts)
+#train_adjusted = diff(train_ts)
+#test_adjusted = diff(test_ts)
+log_train = log(train_ts)
+log_test = log(test_ts)
+plot(log_train)
+arima1 = auto.arima(log_train, trace = TRUE, test = "kpss", ic = "bic")
+summary(arima1)
+confint(arima1)
+
+plot.ts(arima1$residuals)
+Box.test(arima1$residuals, lag = 20, type = "Ljung-Box")
+acf(arima1$residuals, lag.max = 30)
+Box.test(arima1$residuals^2, lag = 20, type = "Ljung-Box")
+jarque.bera.test(arima1$residuals)
+arima1.forecast = forecast(arima1, h = 24)
+arima1.forecast
+plot(arima1.forecast)
+
+library(TSPred)
+plotarimapred(log_test, arima1, xlim = c(2005,2010), range.percent = 0.05)
+accuracy(arima1.forecast, test_ts)
